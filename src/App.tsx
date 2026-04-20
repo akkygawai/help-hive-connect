@@ -30,8 +30,8 @@ const App = () => (
             <Route path="/become-provider" element={<BecomeProvider />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/reviews" element={<Reviews />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
