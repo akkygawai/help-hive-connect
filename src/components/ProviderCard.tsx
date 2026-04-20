@@ -2,7 +2,6 @@ import { Star, MapPin, Clock, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Provider } from "@/lib/mock-data";
-import { Link } from "react-router-dom";
 
 interface Props {
   provider: Provider;
@@ -43,12 +42,12 @@ const ProviderCard = ({ provider }: Props) => (
     <div className="mt-auto flex items-center gap-4 border-t border-border pt-3 text-xs text-muted-foreground">
       <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{provider.location}</span>
       <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{provider.experience}yr exp</span>
-      <span className="ml-auto font-heading text-base font-bold text-foreground">${provider.hourlyRate}<span className="text-xs font-normal text-muted-foreground">/hr</span></span>
+      <span className="ml-auto font-heading text-base font-bold text-foreground">₹{provider.hourlyRate}<span className="text-xs font-normal text-muted-foreground">/hr</span></span>
     </div>
 
-    <Link to="/login" className="mt-3">
+    <a href={`tel:${provider.phone}`} className="mt-3 block">
       <Button size="sm" className="w-full">Request Service</Button>
-    </Link>
+    </a>
   </div>
 );
 

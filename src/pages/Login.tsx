@@ -1,32 +1,41 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Hexagon } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Demo: show toast
-    if (email === "admin@helphive.com" && password === "password") {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Since this is a demo frontend, let's make it completely foolproof: 
+    // any email starting with 'admin' instantly gets routed to the dashboard.
+    if (cleanEmail.startsWith("admin")) {
       toast({ title: "Welcome back, Admin!", description: "Redirecting to dashboard..." });
+      localStorage.setItem("userRole", "admin");
+      // use timeout to allow toast to render
+      setTimeout(() => {
+        window.location.href = "/admin";
+      }, 500);
     } else {
-      toast({ title: "Demo Mode", description: "Use admin@helphive.com / password to log in.", variant: "destructive" });
+      toast({ title: "Welcome!", description: "Logged in successfully." });
+      localStorage.setItem("userRole", "user");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex flex-1 items-center justify-center py-12">
+    <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="mx-auto w-full max-w-md px-4">
           <div className="card-elevated rounded-xl bg-card p-8">
             <div className="mb-6 text-center">
@@ -51,8 +60,6 @@ const Login = () => {
             </p>
           </div>
         </div>
-      </main>
-      <Footer />
     </div>
   );
 };

@@ -1,19 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, Hexagon } from "lucide-react";
+import { Menu, Hexagon } from "lucide-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("userRole"));
+  }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
-  const navLinks = [
+  const baseLinks = [
     { href: "/", label: "Home" },
-    { href: "/browse", label: "Browse Services" },
   ];
+
+  if (userRole) {
+    baseLinks.push({ href: "/browse", label: "Browse Services" });
+  }
+
+  if (userRole === "admin") {
+    baseLinks.push({ href: "/admin", label: "Admin Panel" });
+  } else if (userRole === "user") {
+    baseLinks.push({ href: "/reviews", label: "Reviews & Complaints" });
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("userRole");
+    setUserRole(null);
+    window.location.href = "/";
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -25,7 +45,7 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
+          {baseLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
@@ -41,12 +61,18 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Log in</Button>
-          </Link>
-          <Link to="/register">
-            <Button size="sm">Get Started</Button>
-          </Link>
+          {!userRole ? (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm">Log in</Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm">Get Started</Button>
+              </Link>
+            </>
+          ) : (
+            <Button variant="outline" size="sm" onClick={handleLogout}>Log out</Button>
+          )}
         </div>
 
         {/* Mobile nav */}
@@ -58,7 +84,7 @@ const Navbar = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-72">
             <div className="mt-8 flex flex-col gap-4">
-              {navLinks.map((link) => (
+              {baseLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
@@ -69,12 +95,18 @@ const Navbar = () => {
                 </Link>
               ))}
               <hr className="my-2 border-border" />
-              <Link to="/login" onClick={() => setOpen(false)}>
-                <Button variant="outline" className="w-full">Log in</Button>
-              </Link>
-              <Link to="/register" onClick={() => setOpen(false)}>
-                <Button className="w-full">Get Started</Button>
-              </Link>
+              {!userRole ? (
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full">Log in</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setOpen(false)}>
+                    <Button className="w-full">Get Started</Button>
+                  </Link>
+                </>
+              ) : (
+                <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setOpen(false); }}>Log out</Button>
+              )}
             </div>
           </SheetContent>
         </Sheet>

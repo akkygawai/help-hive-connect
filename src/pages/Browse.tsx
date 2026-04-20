@@ -1,12 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProviderCard from "@/components/ProviderCard";
-import { categories, providers } from "@/lib/mock-data";
+import { categories, providers, Provider } from "@/lib/mock-data";
 import { useSearchParams } from "react-router-dom";
 
 const Browse = () => {
@@ -15,16 +13,28 @@ const Browse = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(initialCat);
 
-  const filtered = providers.filter((p) => {
+  const [allProviders] = useState<Provider[]>(() => {
+    const stored = localStorage.getItem("allProviders");
+    if (stored) return JSON.parse(stored);
+    localStorage.setItem("allProviders", JSON.stringify(providers));
+    return providers;
+  });
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    if (!role) {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const filtered = allProviders.filter((p) => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.skills.some(s => s.toLowerCase().includes(search.toLowerCase()));
     const matchCat = categoryFilter === "all" || p.categoryId === categoryFilter;
     return matchSearch && matchCat;
   });
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex-1 py-8">
+    <div className="py-8">
         <div className="container">
           <h1 className="font-heading text-3xl font-bold text-foreground">Browse Service Providers</h1>
           <p className="mt-1 text-muted-foreground">Find verified professionals in your area</p>
@@ -67,8 +77,6 @@ const Browse = () => {
             </div>
           )}
         </div>
-      </main>
-      <Footer />
     </div>
   );
 };

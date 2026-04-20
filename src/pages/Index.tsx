@@ -1,18 +1,28 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import CategoryCard from "@/components/CategoryCard";
 import ProviderCard from "@/components/ProviderCard";
-import { categories, providers } from "@/lib/mock-data";
+import { categories, providers, Provider } from "@/lib/mock-data";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
+  const [userRole, setUserRole] = useState<string | null>(null);
 
+  const [allProviders] = useState<Provider[]>(() => {
+    const stored = localStorage.getItem("allProviders");
+    if (stored) return JSON.parse(stored);
+    localStorage.setItem("allProviders", JSON.stringify(providers));
+    return providers;
+  });
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("userRole"));
+  }, []);
+
+  return (
+    <div className="flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden gradient-hero py-20 md:py-28">
         <div className="container relative z-10">
@@ -30,7 +40,7 @@ const Index = () => {
                     Browse Services <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/become-provider">
                   <Button size="lg" variant="outline" className="border-warm-400 text-warm-100 hover:bg-warm-700">
                     Become a Provider
                   </Button>
@@ -75,34 +85,39 @@ const Index = () => {
             <p className="mt-2 text-muted-foreground">Find the right professional for any job</p>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {categories.map((cat) => (
-              <Link key={cat.id} to={`/browse?category=${cat.id}`}>
-                <CategoryCard category={cat} />
-              </Link>
-            ))}
+            {categories.map((cat) => {
+              const liveCount = allProviders.filter(p => p.categoryId === cat.id).length;
+              return (
+                <Link key={cat.id} to={userRole ? `/browse?category=${cat.id}` : "/login"}>
+                  <CategoryCard category={{ ...cat, providerCount: liveCount }} />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Featured Providers */}
-      <section className="bg-secondary/50 py-16">
-        <div className="container">
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <h2 className="font-heading text-3xl font-bold text-foreground">Top Rated Providers</h2>
-              <p className="mt-2 text-muted-foreground">Trusted professionals with great reviews</p>
+      {userRole && (
+        <section className="bg-secondary/50 py-16">
+          <div className="container">
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <h2 className="font-heading text-3xl font-bold text-foreground">Top Rated Providers</h2>
+                <p className="mt-2 text-muted-foreground">Trusted professionals with great reviews</p>
+              </div>
+              <Link to="/browse" className="hidden text-sm font-medium text-accent hover:underline md:block">
+                View all →
+              </Link>
             </div>
-            <Link to="/browse" className="hidden text-sm font-medium text-accent hover:underline md:block">
-              View all →
-            </Link>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {allProviders.slice(0, 3).map((p) => (
+                <ProviderCard key={p.id} provider={p} />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {providers.slice(0, 3).map((p) => (
-              <ProviderCard key={p.id} provider={p} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* How it works */}
       <section className="py-16">
@@ -128,19 +143,20 @@ const Index = () => {
       </section>
 
       {/* CTA */}
-      <section className="gradient-hero py-16">
-        <div className="container text-center">
-          <h2 className="font-heading text-3xl font-bold text-warm-50">Ready to Get Started?</h2>
-          <p className="mx-auto mt-3 max-w-md text-warm-300">Join thousands of satisfied customers and skilled providers on The Help Hive.</p>
-          <div className="mt-8 flex justify-center gap-3">
-            <Link to="/register">
-              <Button size="lg">Create an Account</Button>
-            </Link>
+      {!userRole && (
+        <section className="gradient-hero py-16">
+          <div className="container text-center">
+            <h2 className="font-heading text-3xl font-bold text-warm-50">Ready to Get Started?</h2>
+            <p className="mx-auto mt-3 max-w-md text-warm-300">Join thousands of satisfied customers and skilled providers on The Help Hive.</p>
+            <div className="mt-8 flex justify-center gap-3">
+              <Link to="/register">
+                <Button size="lg">Create an Account</Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <Footer />
     </div>
   );
 };

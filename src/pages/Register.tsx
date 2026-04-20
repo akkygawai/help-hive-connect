@@ -1,28 +1,36 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Hexagon } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { categories } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
   const [role, setRole] = useState("user");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Demo Mode", description: "Registration would create your account. Connect Lovable Cloud to enable real auth!" });
+    
+    // Set standard user role in local storage to simulate authentication
+    localStorage.setItem("userRole", "user");
+    toast({ title: "Success", description: "Account created successfully!" });
+    
+    setTimeout(() => {
+      if (role === "provider") {
+        window.location.href = "/become-provider";
+      } else {
+        window.location.href = "/";
+      }
+    }, 500);
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex flex-1 items-center justify-center py-12">
+    <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="mx-auto w-full max-w-md px-4">
           <div className="card-elevated rounded-xl bg-card p-8">
             <div className="mb-6 text-center">
@@ -78,8 +86,6 @@ const Register = () => {
             </p>
           </div>
         </div>
-      </main>
-      <Footer />
     </div>
   );
 };
