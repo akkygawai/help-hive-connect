@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Reviews from "./pages/Reviews";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/browse" element={<Browse />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/become-provider" element={<BecomeProvider />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/reviews" element={<Reviews />} />

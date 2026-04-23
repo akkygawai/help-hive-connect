@@ -71,7 +71,12 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <Button variant="outline" size="sm" onClick={handleLogout}>Log out</Button>
+            <>
+              <Link to="/profile">
+                <Button variant="ghost" size="sm">Profile</Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={handleLogout}>Log out</Button>
+            </>
           )}
         </div>
 
@@ -105,7 +110,12 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setOpen(false); }}>Log out</Button>
+                <>
+                  <Link to="/profile" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full mb-2">Profile</Button>
+                  </Link>
+                  <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setOpen(false); }}>Log out</Button>
+                </>
               )}
             </div>
           </SheetContent>

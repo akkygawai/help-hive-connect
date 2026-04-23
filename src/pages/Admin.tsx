@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { sampleUsers, sampleReviews, providers as defaultProviders, Provider } from "@/lib/mock-data";
+import { sampleUsers, sampleReviews, providers as defaultProviders, Provider, AppUser } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const [allProviders, setAllProviders] = useState<Provider[]>([]);
+  const [allUsers, setAllUsers] = useState<AppUser[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -23,6 +24,14 @@ const Admin = () => {
     } else {
       localStorage.setItem("allProviders", JSON.stringify(defaultProviders));
       setAllProviders(defaultProviders);
+    }
+
+    const storedUsers = localStorage.getItem("allUsers");
+    if (storedUsers) {
+      setAllUsers(JSON.parse(storedUsers));
+    } else {
+      localStorage.setItem("allUsers", JSON.stringify(sampleUsers));
+      setAllUsers(sampleUsers);
     }
   }, []);
 
@@ -42,6 +51,13 @@ const Admin = () => {
     toast({ title: "Deleted", description: "Provider has been removed.", variant: "destructive" });
   };
 
+  const handleDeleteUser = (id: string) => {
+    const updated = allUsers.filter(u => u.id !== id);
+    setAllUsers(updated);
+    localStorage.setItem("allUsers", JSON.stringify(updated));
+    toast({ title: "Deleted", description: "User account has been removed.", variant: "destructive" });
+  };
+
   return (
     <div className="container py-12">
       <h1 className="font-heading text-3xl font-bold text-foreground mb-8">Admin Dashboard</h1>
@@ -54,15 +70,22 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {sampleUsers.map((u) => (
+              {allUsers.map((u) => (
                 <div key={u.id} className="flex justify-between items-center border-b pb-2">
                   <div>
                     <h3 className="font-semibold text-foreground">{u.name}</h3>
                     <p className="text-sm text-muted-foreground">{u.email}</p>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs uppercase bg-secondary px-2 py-1 rounded-md text-foreground">{u.role}</span>
-                    <p className="mt-1 text-xs text-muted-foreground">Joined: {u.joinedAt}</p>
+                  <div className="flex items-center gap-4 text-right">
+                    <div>
+                      <span className="text-xs uppercase bg-secondary px-2 py-1 rounded-md text-foreground">{u.role}</span>
+                      <p className="mt-1 text-xs text-muted-foreground">Joined: {u.joinedAt}</p>
+                    </div>
+                    {u.role === "user" && (
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteUser(u.id)} className="text-destructive h-8 w-8 shrink-0">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
