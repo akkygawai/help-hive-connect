@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Category {
+  id            String     @id
+  name          String
+  description   String
+  icon          String
+  providerCount Int
+  providers     Provider[]
+}
+
+model Provider {
+  id           String   @id
+  name         String
+  category     String
+  categoryId   String
+  categoryRel  Category @relation(fields: [categoryId], references: [id])
+  rating       Float
+  reviewCount  Int
+  hourlyRate   Float
+  experience   Int
+  location     String
+  bio          String
+  skills       String
+  availability String
+  verified     Boolean
+  avatar       String
+  phone        String
+}
+
+model ServiceRequest {
+  id           String   @id
+  title        String
+  description  String
+  category     String
+  status       String
+  providerName String?
+  location     String
+  date         String
+  budget       Float?
+  customerName String?
+}
+
+model AppUser {
+  id       String   @id
+  name     String
+  email    String   @unique
+  role     String
+  joinedAt String
+  status   String
+}
+
+model Review {
+  id       String   @id
+  userId   String
+  userName String
+  type     String
+  content  String
+  rating   Int?
+  date     String
+  status   String
+}

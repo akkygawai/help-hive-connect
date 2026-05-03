@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { sampleUsers, sampleReviews, providers as defaultProviders, Provider, AppUser } from "@/lib/mock-data";
+import { Provider, AppUser } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProviders, fetchUsers, fetchReviews } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,30 +10,26 @@ import { Trash2, Save, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
+  const { data: fetchedProviders } = useQuery({ queryKey: ['providers'], queryFn: fetchProviders });
+  const { data: fetchedUsers } = useQuery({ queryKey: ['users'], queryFn: fetchUsers });
+  const { data: fetchedReviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
+
   const [allProviders, setAllProviders] = useState<Provider[]>([]);
   const [allUsers, setAllUsers] = useState<AppUser[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
+    if (fetchedProviders && allProviders.length === 0) setAllProviders(fetchedProviders);
+  }, [fetchedProviders, allProviders.length]);
+
+  useEffect(() => {
+    if (fetchedUsers && allUsers.length === 0) setAllUsers(fetchedUsers);
+  }, [fetchedUsers, allUsers.length]);
+
+  useEffect(() => {
     const role = localStorage.getItem("userRole");
     if (role !== "admin") {
       window.location.href = "/";
-    }
-
-    const stored = localStorage.getItem("allProviders");
-    if (stored) {
-      setAllProviders(JSON.parse(stored));
-    } else {
-      localStorage.setItem("allProviders", JSON.stringify(defaultProviders));
-      setAllProviders(defaultProviders);
-    }
-
-    const storedUsers = localStorage.getItem("allUsers");
-    if (storedUsers) {
-      setAllUsers(JSON.parse(storedUsers));
-    } else {
-      localStorage.setItem("allUsers", JSON.stringify(sampleUsers));
-      setAllUsers(sampleUsers);
     }
   }, []);
 
@@ -100,7 +98,7 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {sampleReviews.map((r) => (
+              {fetchedReviews.map((r) => (
                 <div key={r.id} className="border-b pb-2">
                   <div className="flex justify-between">
                     <span className="text-sm font-bold text-foreground">{r.userName}</span>

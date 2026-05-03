@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Hexagon } from "lucide-react";
-import { categories, Provider } from "@/lib/mock-data";
+import { Provider } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 const BecomeProvider = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
   
   const [formData, setFormData] = useState({
     name: "",

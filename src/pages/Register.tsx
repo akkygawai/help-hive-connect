@@ -7,10 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Hexagon, CheckCircle, XCircle } from "lucide-react";
-import { categories, sampleUsers, providers as defaultProviders } from "@/lib/mock-data";
+import { sampleUsers, providers as defaultProviders } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
+  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
   const [role, setRole] = useState("user");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

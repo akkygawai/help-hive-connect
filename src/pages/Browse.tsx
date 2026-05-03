@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import ProviderCard from "@/components/ProviderCard";
-import { categories, providers, Provider } from "@/lib/mock-data";
+import { Provider } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories, fetchProviders } from "@/lib/api";
 import { useSearchParams } from "react-router-dom";
 
 const Browse = () => {
@@ -13,11 +15,14 @@ const Browse = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(initialCat);
 
-  const [allProviders] = useState<Provider[]>(() => {
-    const stored = localStorage.getItem("allProviders");
-    if (stored) return JSON.parse(stored);
-    localStorage.setItem("allProviders", JSON.stringify(providers));
-    return providers;
+  const { data: allProviders = [] } = useQuery({
+    queryKey: ['providers'],
+    queryFn: fetchProviders,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
   });
 
   useEffect(() => {

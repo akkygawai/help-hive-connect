@@ -4,17 +4,22 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import CategoryCard from "@/components/CategoryCard";
 import ProviderCard from "@/components/ProviderCard";
-import { categories, providers, Provider } from "@/lib/mock-data";
+import { Provider } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories, fetchProviders } from "@/lib/api";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Index = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  const [allProviders] = useState<Provider[]>(() => {
-    const stored = localStorage.getItem("allProviders");
-    if (stored) return JSON.parse(stored);
-    localStorage.setItem("allProviders", JSON.stringify(providers));
-    return providers;
+  const { data: allProviders = [] } = useQuery({
+    queryKey: ['providers'],
+    queryFn: fetchProviders,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
   });
 
   useEffect(() => {

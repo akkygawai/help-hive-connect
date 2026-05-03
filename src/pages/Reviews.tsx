@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { sampleReviews, Review } from "@/lib/mock-data";
+import { Review } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchReviews } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,10 +9,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState<Review[]>(sampleReviews);
+  const { data: fetchedReviews } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [content, setContent] = useState("");
   const [type, setType] = useState<"review" | "complaint">("review");
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (fetchedReviews) setReviews(fetchedReviews);
+  }, [fetchedReviews]);
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
